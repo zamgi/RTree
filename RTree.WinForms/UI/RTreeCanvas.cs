@@ -177,14 +177,14 @@ namespace trees.win_forms
         {
             if ( query == null ) return;
 
+            var rc = query.Envelope.ToRectangle( boundRectHeight );
             switch ( query.SearchByMethod )
             {
-                case SearchByMethodEnum.Rect  : gr.DrawRectangle( _SearchRectPen, query.Envelope.ToRectangle( boundRectHeight ) ); break;
+                case SearchByMethodEnum.Rect  : gr.DrawRectangle( _SearchRectPen, rc ); break;
                 case SearchByMethodEnum.Circle:
-                    gr.DrawCircle_Outscribed( _SearchRectPen, query.Envelope.ToRectangle( boundRectHeight ) );
+                    gr.DrawCircle_Outscribed( _SearchRectPen, rc );
                     /*void draw_cross( int len = 7 )
                     {
-                        var rc = query.Envelope.ToRectangle( boundRectHeight );
                         var pt = (x: rc.X + rc.Width / 2, y: rc.Y + rc.Height / 2);
                         gr.DrawLine( _SearchRectPen, pt.x - len, pt.y, pt.x + len, pt.y );
                         gr.DrawLine( _SearchRectPen, pt.x, pt.y - len, pt.x, pt.y + len );
@@ -275,8 +275,12 @@ namespace trees.win_forms
                 _MoveSelectRect = (_SelectRect != Rectangle.Empty) && (((keys & Keys.Shift) != 0) || ((keys & Keys.Control) != 0));
 
                 _SelectVerticalScrollingOffset = this.VerticalScrollingOffset;
-                if ( !_MoveSelectRect )
+                if ( _MoveSelectRect )
                 {
+                    MoveDrawSelectFigure_Prepare();
+                }
+                else
+                { 
                     _SelectLocation = e.Location;
                     _SelectRect     = new Rectangle( _SelectLocation, Size.Empty ); //Rectangle.Empty;
                 }
@@ -310,22 +314,31 @@ namespace trees.win_forms
                 if ( _MoveSelectRect )
                 {
                     _SelectLocation = e.Location;
-                    MoveDrawSelectFigure( SelectFigure );
+                    MoveDrawSelectFigure();
+                    //_DrawSelectRect = false;
                 }
                 else
                 {
-                    ProcessDrawSelectFigure( e.X, e.Y, SelectFigure );
+                    ProcessDrawSelectFigure( e.X, e.Y );
                 }
             }
         }
 
-        private void MoveDrawSelectFigure( SearchByMethodEnum selectFigure )
+        private void MoveDrawSelectFigure_Prepare()
         {
-            switch ( selectFigure )
+            using var gr = Graphics.FromHwnd( this.Handle );
+            switch ( SelectFigure )
+            {
+                case SearchByMethodEnum.Rect: gr.DrawXORRectangle( _SelectRect, SelectRectColor ); break;
+                case SearchByMethodEnum.Circle: gr.DrawXORCircle( _SelectRect.ToCircle_Outscribed(), SelectRectColor ); break;
+            }
+        }
+        private void MoveDrawSelectFigure()
+        {
+            switch ( SelectFigure )
             {
                 case SearchByMethodEnum.Rect  : MoveDrawSelectRect(); break;
                 case SearchByMethodEnum.Circle: MoveDrawSelectCircle(); break;
-                default: throw new ArgumentException( nameof(selectFigure) );
             }
         }
         private void MoveDrawSelectRect()
@@ -351,13 +364,12 @@ namespace trees.win_forms
             gr.DrawXORCircle( _SelectRect.ToCircle_Outscribed(), SelectRectColor );
         }
 
-        private void ProcessDrawSelectFigure( int current_x, int current_y, SearchByMethodEnum selectFigure )
+        private void ProcessDrawSelectFigure( int current_x, int current_y )
         {
-            switch ( selectFigure )
+            switch ( SelectFigure )
             {
                 case SearchByMethodEnum.Rect  : ProcessDrawSelectRect  ( current_x, current_y ); break;
                 case SearchByMethodEnum.Circle: ProcessDrawSelectCircle( current_x, current_y ); break;
-                default: throw new ArgumentException( nameof(selectFigure) );
             }
         }
         private void ProcessDrawSelectRect( int current_x, int current_y )
