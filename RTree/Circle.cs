@@ -75,7 +75,10 @@ namespace System.Collections.Generic
                 suc = circle.Contains( env.TopLeft() ); if ( suc ) return (true);
                 suc = circle.Contains( env.TopRight() ); if ( suc ) return (true);
                 suc = circle.Contains( env.BottomLeft() ); if ( suc ) return (true);
-                suc = circle.Contains( env.BottomRight() );
+                suc = circle.Contains( env.BottomRight() ); if ( suc ) return (true);
+
+                //rect.center in circle
+                suc = circle.Contains( env.Center_X, env.Center_Y );
 #if DEBUG
                 if ( suc ) return (true);
 #else

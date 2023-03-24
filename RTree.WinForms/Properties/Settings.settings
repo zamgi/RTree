@@ -33,7 +33,7 @@
       <Value Profile="(Default)">15</Value>
     </Setting>
     <Setting Name="SelectRectColor" Type="System.Drawing.Color" Scope="User">
-      <Value Profile="(Default)">Green</Value>
+      <Value Profile="(Default)">Red</Value>
     </Setting>
     <Setting Name="SelectFigure" Type="System.String" Scope="User">
       <Value Profile="(Default)">Circle</Value>

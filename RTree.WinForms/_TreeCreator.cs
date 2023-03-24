@@ -79,6 +79,7 @@ namespace trees.win_forms
         }
 
         public static RTree< RTreeRECT > Create_2( int objCount = 50,
+            int? maxEntries = null,
             int PADDING_X = 500 / 2, int PADDING_Y = 300 / 2,
             int MIN_WH = 20, int MAX_WH = 120 )
         {
@@ -86,19 +87,18 @@ namespace trees.win_forms
             var wa  = Screen.PrimaryScreen.WorkingArea;
             wa.Inflate( -PADDING_X, -PADDING_Y );
             
-            var rtree = new RTree< RTreeRECT >();
+            var rtree = new RTree< RTreeRECT >( maxEntries );
             for ( var i = 1; i <= objCount; i++ )
             {
                 var x = rnd.Next( wa.Left, wa.Right  + 1 );
                 var y = rnd.Next( wa.Top , wa.Bottom + 1 );
                 var w = rnd.Next( MIN_WH , MAX_WH + 1 );
                 var h = rnd.Next( MIN_WH , MAX_WH + 1 );
-                var rc = new RTreeRECT( x, y, w, h, $"t-{i}" );
+                var rc = new RTreeRECT( x, y, w, h, $"{i}" );
                 rtree.Add( rc );
             }
 
             return (rtree);
         }
-
     }
 }

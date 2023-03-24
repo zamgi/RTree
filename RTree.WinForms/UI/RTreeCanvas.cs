@@ -45,8 +45,8 @@ namespace trees.win_forms
             _BoundRectPen             = Pens.Gray;
             _RectPen                  = Pens.Blue;
             _RootFillBrush            = Brushes.LightGreen;
-            _FillBrush                = new HatchBrush( HatchStyle.BackwardDiagonal, Color.Violet, Color.Transparent ); //= Brushes.Violet;
-            _SelectRectColor          = Color.Green;
+            _FillBrush                = new HatchBrush( HatchStyle.DarkDownwardDiagonal, Color.LightGreen, Color.Transparent ); //= Brushes.Violet;
+            _SelectRectColor          = Color.Red;
             _SearchResHighligthHBrush = new HatchBrush( HatchStyle.BackwardDiagonal, _SelectRectColor, Color.Transparent );
             _SearchRectPen            = new Pen( _SelectRectColor, width: 2.0f );
             _Image                    = new Bitmap( 100, 100 );
@@ -252,11 +252,13 @@ namespace trees.win_forms
         }
         [D(X.Hidden)] public SearchByMethodEnum SelectFigure { get; set; } = SearchByMethodEnum.Circle;
 
+
         public event EventHandler StartDrawSelectFigure;
         public event EventHandler< (Envelope env, SearchByMethodEnum figure) > EndDrawSelectFigure;
 
 
         private bool      _DrawSelectRect;
+        private bool      _MoveSelectRect;
         private Point     _SelectLocation;
         private int       _SelectVerticalScrollingOffset;
         private Rectangle _SelectRect;
@@ -269,9 +271,15 @@ namespace trees.win_forms
             _DrawSelectRect = (e.Button == MouseButtons.Left);
             if ( _DrawSelectRect )
             {
+                var keys = Control.ModifierKeys;
+                _MoveSelectRect = (_SelectRect != Rectangle.Empty) && (((keys & Keys.Shift) != 0) || ((keys & Keys.Control) != 0));
+
                 _SelectVerticalScrollingOffset = this.VerticalScrollingOffset;
-                _SelectLocation = e.Location;
-                _SelectRect     = new Rectangle( _SelectLocation, Size.Empty ); //Rectangle.Empty;
+                if ( !_MoveSelectRect )
+                {
+                    _SelectLocation = e.Location;
+                    _SelectRect     = new Rectangle( _SelectLocation, Size.Empty ); //Rectangle.Empty;
+                }
                 StartDrawSelectFigure?.Invoke( this, EventArgs.Empty );
 
                 _ScrollIfNeedTimer.Interval = ScrollDelayInMilliseconds;
@@ -299,8 +307,48 @@ namespace trees.win_forms
 
             if ( _DrawSelectRect )
             {
-                ProcessDrawSelectFigure( e.X, e.Y, SelectFigure );
+                if ( _MoveSelectRect )
+                {
+                    _SelectLocation = e.Location;
+                    MoveDrawSelectFigure( SelectFigure );
+                }
+                else
+                {
+                    ProcessDrawSelectFigure( e.X, e.Y, SelectFigure );
+                }
             }
+        }
+
+        private void MoveDrawSelectFigure( SearchByMethodEnum selectFigure )
+        {
+            switch ( selectFigure )
+            {
+                case SearchByMethodEnum.Rect  : MoveDrawSelectRect(); break;
+                case SearchByMethodEnum.Circle: MoveDrawSelectCircle(); break;
+                default: throw new ArgumentException( nameof(selectFigure) );
+            }
+        }
+        private void MoveDrawSelectRect()
+        {
+            using var gr = Graphics.FromHwnd( this.Handle );
+
+            gr.DrawXORRectangle( _SelectRect, SelectRectColor );
+
+            var y = _SelectLocation.Y - (this.VerticalScrollingOffset - _SelectVerticalScrollingOffset);
+            _SelectRect = new Rectangle( _SelectLocation.X - _SelectRect.Width / 2, y - _SelectRect.Height / 2, _SelectRect.Width, _SelectRect.Height );
+
+            gr.DrawXORRectangle( _SelectRect, SelectRectColor );
+        }
+        private void MoveDrawSelectCircle()
+        {
+            using var gr = Graphics.FromHwnd( this.Handle );
+
+            gr.DrawXORCircle( _SelectRect.ToCircle_Outscribed(), SelectRectColor );
+
+            var y = _SelectLocation.Y - (this.VerticalScrollingOffset - _SelectVerticalScrollingOffset);
+            _SelectRect = new Rectangle( _SelectLocation.X - _SelectRect.Width / 2, y - _SelectRect.Height / 2, _SelectRect.Width, _SelectRect.Height );
+            
+            gr.DrawXORCircle( _SelectRect.ToCircle_Outscribed(), SelectRectColor );
         }
 
         private void ProcessDrawSelectFigure( int current_x, int current_y, SearchByMethodEnum selectFigure )
