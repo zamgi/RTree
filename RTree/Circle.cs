@@ -85,15 +85,20 @@ namespace System.Collections.Generic
                 {
                     suc = ((circle.Center_Y < env.Min_Y) && (env.Min_Y < circle.Center_Y + circle.Radius)) || //above circle-center
                           ((env.Max_Y < circle.Center_Y) && (circle.Center_Y - circle.Radius < env.Max_Y)); //beyond circle-center
+#if DEBUG
                     if ( suc ) return (true);
+#endif
                 }
                 //intercect long-vertical rect 
                 else if ( (env.Min_Y < circle.Center_Y) && (circle.Center_Y < env.Max_Y) )
                 {
                     suc = ((circle.Center_X < env.Min_X) && (env.Min_X < circle.Center_X + circle.Radius)) || //rigth circle-center
                           ((env.Max_X < circle.Center_X) && (circle.Center_X - circle.Radius < env.Max_X)); //left circle-center
+#if DEBUG
                     if ( suc ) return (true);
+#endif
                 }
+                return (suc);
             }
             return (false);
         }
