@@ -207,6 +207,189 @@ namespace System.Collections.Generic
             PostProcesResult( intersections, topN );
             return (intersections);
         }
+
+        private bool DoTrySearch_By_Rect( in Envelope boundingBox, int topN, out IReadOnlyList< (T t, float dist) > res )
+        {
+            if ( !Root.Envelope.Intersects( boundingBox ) )
+            {
+                res = default;
+                return (false);
+            }
+
+            var intersections = new List< (T t, float dist) >( _Count );
+            var queue = new Queue< Node >();
+            queue.Enqueue( Root );
+
+            while ( queue.Count != 0 )
+            {
+                var node = queue.Dequeue();
+                if ( node.IsLeaf )
+                {
+                    foreach ( T t_child in node.Children.Cast< T >() )
+                    {
+                        if ( t_child.Envelope.Intersects( boundingBox ) )
+                        {
+                            ref readonly var env = ref t_child.Envelope;
+                            var dist = MathF.Sqrt( MathF.Pow( (env.Center_X - boundingBox.Center_X), 2 ) + MathF.Pow( (env.Center_Y - boundingBox.Center_Y), 2 ) );
+
+                            intersections.Add( (t_child, dist) );
+                        }
+                    }
+                }
+                else
+                {
+                    foreach ( var child in node.Children.Cast< Node >() )
+                    {
+                        if ( child.Envelope.Intersects( boundingBox ) )
+                        {
+                            queue.Enqueue( child );
+                        }
+                    }
+                }
+            }
+
+            PostProcesResult( intersections, topN );
+            res = intersections;
+            return (intersections.Count != 0);
+        }
+        private bool DoTrySearch_By_Circle( in Circle circle, int topN, out IReadOnlyList< (T t, float dist) > res )
+        {
+            if ( !Root.Envelope.Intersects( circle ) )
+            {
+                res = default;
+                return (false);
+            }
+
+            var intersections = new List< (T t, float dist) >( _Count );
+            var queue = new Queue< Node >();
+            queue.Enqueue( Root );
+
+            while ( queue.Count != 0 )
+            {
+                var node = queue.Dequeue();
+                if ( node.IsLeaf )
+                {
+                    foreach ( T t_child in node.Children.Cast< T >() )
+                    {
+                        if ( t_child.Envelope.Intersects( circle, out var dist ) )
+                        {
+                            intersections.Add( (t_child, dist) );
+                        }
+                    }
+                }
+                else
+                {
+                    foreach ( var child in node.Children.Cast< Node >() )
+                    {
+                        if ( child.Envelope.Intersects( circle ) )
+                        {
+                            queue.Enqueue( child );
+                        }
+                    }
+                }
+            }
+
+            PostProcesResult( intersections, topN );
+            res = intersections;
+            return (intersections.Count != 0);
+        }
+
+        private bool DoTrySearchFirst_By_Rect( in Envelope boundingBox, /*int topN,*/ out (T t, float dist) res )
+        {
+            if ( !Root.Envelope.Intersects( boundingBox ) )
+            {
+                res = default;
+                return (false);
+            }
+
+            //var intersections = new List< (T t, float dist) >( _Count );
+            var queue = new Queue< Node >();
+            queue.Enqueue( Root );
+
+            while ( queue.Count != 0 )
+            {
+                var node = queue.Dequeue();
+                if ( node.IsLeaf )
+                {
+                    foreach ( T t_child in node.Children.Cast< T >() )
+                    {
+                        if ( t_child.Envelope.Intersects( boundingBox ) )
+                        {
+                            ref readonly var env = ref t_child.Envelope;
+                            var dist = MathF.Sqrt( MathF.Pow( (env.Center_X - boundingBox.Center_X), 2 ) + MathF.Pow( (env.Center_Y - boundingBox.Center_Y), 2 ) );
+
+                            //intersections.Add( (t_child, dist) );
+                            res = (t_child, dist);
+                            return (true);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach ( var child in node.Children.Cast< Node >() )
+                    {
+                        if ( child.Envelope.Intersects( boundingBox ) )
+                        {
+                            queue.Enqueue( child );
+                        }
+                    }
+                }
+            }
+
+            //PostProcesResult( intersections, topN );
+            //res = intersections;
+            //return (intersections.Count != 0);
+
+
+            res = default;
+            return (false);
+        }
+        private bool DoTrySearchFirst_By_Circle( in Circle circle, /*int topN,*/ out (T t, float dist) res )
+        {
+            if ( !Root.Envelope.Intersects( circle ) )
+            {
+                res = default;
+                return (false);
+            }
+
+            //var intersections = new List< (T t, float dist) >( _Count );
+            var queue = new Queue< Node >();
+            queue.Enqueue( Root );
+
+            while ( queue.Count != 0 )
+            {
+                var node = queue.Dequeue();
+                if ( node.IsLeaf )
+                {
+                    foreach ( T t_child in node.Children.Cast< T >() )
+                    {
+                        if ( t_child.Envelope.Intersects( circle, out var dist ) )
+                        {
+                            //intersections.Add( (t_child, dist) );
+                            res = (t_child, dist);
+                            return (true);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach ( var child in node.Children.Cast< Node >() )
+                    {
+                        if ( child.Envelope.Intersects( circle ) )
+                        {
+                            queue.Enqueue( child );
+                        }
+                    }
+                }
+            }
+
+            //PostProcesResult( intersections, topN );
+            //res = intersections;
+            //return (intersections.Count != 0);
+
+            res = default;
+            return (false);
+        }
         #endregion
 
         #region [.Insert.]

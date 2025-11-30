@@ -54,6 +54,12 @@ namespace System.Collections.Generic
         public IReadOnlyList< (T t, float dist) > Search_By_Rect( in Envelope boundingBox, int topN ) => DoSearch_By_Rect( boundingBox, topN );
         public IReadOnlyList< (T t, float dist) > Search_By_Circle( in Circle circle, int topN ) => DoSearch_By_Circle( circle, topN );
 
+        public bool TrySearch_By_Rect( in Envelope boundingBox, int topN, out IReadOnlyList< (T t, float dist) > res ) => DoTrySearch_By_Rect( boundingBox, topN, out res );
+        public bool TrySearch_By_Circle( in Circle circle, int topN, out IReadOnlyList< (T t, float dist) > res ) => DoTrySearch_By_Circle( circle, topN, out res );
+
+        public bool TrySearchFirst_By_Rect( in Envelope boundingBox, out (T t, float dist) res ) => DoTrySearchFirst_By_Rect( boundingBox, out res );
+        public bool TrySearchFirst_By_Circle( in Circle circle, out (T t, float dist) res ) => DoTrySearchFirst_By_Circle( circle, out res );
+
         public List< Node > GetNodes()
         {
             var lst = new List< Node >( _Count / 5 );
