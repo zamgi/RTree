@@ -2,30 +2,30 @@
 
 namespace System.Collections.Generic
 {
-	/// <summary>
-	/// 
-	/// </summary>
-	public readonly struct Circle : IEquatable< Circle >
-	{
-		public float Center_X { get; }
-		public float Center_Y { get; }
-		public float Radius   { get; }
+    /// <summary>
+    /// 
+    /// </summary>
+    public readonly struct Circle : IEquatable< Circle >
+    {
+        public float Center_X { get; }
+        public float Center_Y { get; }
+        public float Radius   { get; }
 
-		public override string ToString() => $"x={Center_X}, y={Center_Y}, radius={Radius}";
+        public override string ToString() => $"x={Center_X}, y={Center_Y}, radius={Radius}";
 
-		//public float Width  => Max_X - Min_X;
-		//public float Height => Max_Y - Min_Y;
-		//public float Area   => MathF.Max( this.Max_X - this.Min_X, 0 ) * MathF.Max( this.Max_Y - this.Min_Y, 0 );
-		//public float Margin => MathF.Max( this.Max_X - this.Min_X, 0 ) + MathF.Max( this.Max_Y - this.Min_Y, 0 );
+        //public float Width  => Max_X - Min_X;
+        //public float Height => Max_Y - Min_Y;
+        //public float Area   => MathF.Max( this.Max_X - this.Min_X, 0 ) * MathF.Max( this.Max_Y - this.Min_Y, 0 );
+        //public float Margin => MathF.Max( this.Max_X - this.Min_X, 0 ) + MathF.Max( this.Max_Y - this.Min_Y, 0 );
 
         public static implicit operator Circle( in (float center_x, float center_y, float radius) t ) => new Circle( t.center_x, t.center_y, t.radius );
 
-		public Circle( float center_x, float center_y, float radius )
-		{
-			this.Center_X = center_x;
-			this.Center_Y = center_y;
-			this.Radius   = radius;
-		}
+        public Circle( float center_x, float center_y, float radius )
+        {
+            this.Center_X = center_x;
+            this.Center_Y = center_y;
+            this.Radius   = radius;
+        }
 
         public bool Contains( float x, float y )
         {
@@ -38,30 +38,30 @@ namespace System.Collections.Generic
         public bool Contains( in Point pt ) => Contains( pt.X, pt.Y );
 
         public bool Equals( Circle e ) => (this == e);
-		public override bool Equals( object obj ) => (obj is Circle e) && (e == this);
-		public override int GetHashCode() => HashCode.Combine( Center_X, Center_Y, Radius );
+        public override bool Equals( object obj ) => (obj is Circle e) && (e == this);
+        public override int GetHashCode() => HashCode.Combine( Center_X, Center_Y, Radius );
 
         public static bool operator ==( in Circle left, in Circle right ) => left.Center_X == right.Center_X && left.Center_Y == right.Center_Y && left.Radius == right.Radius;
-		public static bool operator !=( in Circle left, in Circle right ) => !(left == right);
+        public static bool operator !=( in Circle left, in Circle right ) => !(left == right);
 
-		public static Circle Empty { get; } = new Circle( center_x: float.PositiveInfinity, center_y: float.PositiveInfinity, radius: 0 );
+        public static Circle Empty { get; } = new Circle( center_x: float.PositiveInfinity, center_y: float.PositiveInfinity, radius: 0 );
     }
 
-	/// <summary>
-	/// 
-	/// </summary>
-	public static class Circle_Extensions
-	{
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class Circle_Extensions
+    {
         public static bool Intersects( in this Envelope env, in Circle circle ) => env.Intersects( circle, out var _ );
         public static bool Intersects( in this Envelope env, in Circle circle, out float dist )
-		{
-			var cathetus_x = env.Center_X - circle.Center_X;
+        {
+            var cathetus_x = env.Center_X - circle.Center_X;
             var cathetus_y = env.Center_Y - circle.Center_Y;
-			dist = MathF.Sqrt( cathetus_x * cathetus_x + cathetus_y * cathetus_y );
+            dist = MathF.Sqrt( cathetus_x * cathetus_x + cathetus_y * cathetus_y );
 
-			var osculation_dict = circle.Radius + env.GetCoverCircleRadius();
-			if ( dist < osculation_dict )
-			{
+            var osculation_dict = circle.Radius + env.GetCoverCircleRadius();
+            if ( dist < osculation_dict )
+            {
                 //circle.center in rect
                 var suc = env.Contains( circle.Center_X, circle.Center_Y ); if ( suc ) return (true);
 
