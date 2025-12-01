@@ -142,8 +142,8 @@ namespace System.Collections.Generic
             var candidates = DoPathSearch( t.Envelope );
             var seq = candidates.Where( c =>
             {
-                if ( c.Peek() is T t )
-                    return (_Comparer.Equals( t, t ));
+                if ( c.Peek() is T tt )
+                    return (_Comparer.Equals( t, tt ));
                 return (false);
             });
 

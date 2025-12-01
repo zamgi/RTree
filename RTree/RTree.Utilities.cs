@@ -9,11 +9,12 @@ namespace System.Collections.Generic
     public partial class RTree< T >
     {
         #region [.Search.]
+        private static List< ImmutableStack< ISpatialData > > _EMPTY_LIST_1 = new List< ImmutableStack< ISpatialData > >();
         private List< ImmutableStack< ISpatialData > > DoPathSearch( in Envelope boundingBox )
         {
             if ( !Root.Envelope.Intersects( boundingBox ) )
             {
-                return (new List< ImmutableStack< ISpatialData > >());
+                return (_EMPTY_LIST_1);
             }
 
             var intersections = new List< ImmutableStack< ISpatialData > >();
@@ -58,11 +59,13 @@ namespace System.Collections.Generic
             }
             return (intersections);
         }
+
+        private static List< (T t, float dist) > _EMPTY_LIST_2 = new List< (T t, float dist) >();
         private List< (T t, float dist) > DoSearch_By_Rect( in Envelope boundingBox, int topN )
         {
             if ( !Root.Envelope.Intersects( boundingBox ) )
             {
-                return (new List< (T t, float dist) >());
+                return (_EMPTY_LIST_2);
             }
 
             var intersections = new List< (T t, float dist) >( _Count );
@@ -172,7 +175,7 @@ namespace System.Collections.Generic
         {
             if ( !Root.Envelope.Intersects( circle ) )
             {
-                return (new List< (T t, float dist) >());
+                return (_EMPTY_LIST_2);
             }
 
             var intersections = new List< (T t, float dist) >( _Count );
