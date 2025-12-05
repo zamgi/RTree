@@ -329,7 +329,7 @@ namespace trees.win_forms
             using var gr = Graphics.FromHwnd( this.Handle );
             switch ( SelectFigure )
             {
-                case SearchByMethodEnum.Rect: gr.DrawXORRectangle( _SelectRect, SelectRectColor ); break;
+                case SearchByMethodEnum.Rect  : gr.DrawXORRectangle( _SelectRect, SelectRectColor ); break;
                 case SearchByMethodEnum.Circle: gr.DrawXORCircle( _SelectRect.ToCircle_Outscribed(), SelectRectColor ); break;
             }
         }

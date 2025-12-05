@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Windows.Forms;
 
 using DC = System.Runtime.Serialization.DataContractAttribute;
 using DM = System.Runtime.Serialization.DataMemberAttribute;
 using IG = System.Runtime.Serialization.IgnoreDataMemberAttribute;
-using M = System.Runtime.CompilerServices.MethodImplAttribute;
-using O = System.Runtime.CompilerServices.MethodImplOptions;
+using M  = System.Runtime.CompilerServices.MethodImplAttribute;
+using O  = System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace trees.win_forms
 {

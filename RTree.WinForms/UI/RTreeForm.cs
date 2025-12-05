@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -32,7 +31,7 @@ namespace trees.win_forms
             InitializeComponent();
 
             _Settings = Settings.Default;
-            _Checked_Nodes = new HashSet<_Node_>();
+            _Checked_Nodes = new HashSet< _Node_ >();
 
             #region [.additional init of rtreeCanvas/etc.]
             rtreeCanvas.StartDrawSelectFigure += rtreeCanvas_StartDrawSelectFigure;
@@ -87,6 +86,7 @@ namespace trees.win_forms
                 if ( _RTree != null )
                 {
                     InitByTree( TreeCreator.Empty() );
+                    rtreeCanvas.Visible = false;
                     ShowTree();
 
                     await Task.Delay( 500 );
@@ -97,11 +97,12 @@ namespace trees.win_forms
                 _BuildElapsed = sw.StopAndElapsed();
 
                 InitByTree( rtree );
-                ShowTree();
+                ShowTree();                
             }
             finally
             {
-                this.Enabled = true;
+                rtreeCanvas.Visible = true;
+                this.Enabled = true;                
             }
             rtTreeView.SelectedNode = null;
             _Selected_Node = null;
@@ -117,6 +118,9 @@ namespace trees.win_forms
             if ( !base.DesignMode )
             {
                 FormPositionStorer.Load( this, _Settings.RTreeFormPositionJson );
+
+                mainSplitContainer.SplitterMoved   += new SplitterEventHandler(mainSplitContainer_SplitterMoved);
+                canvasSplitContainer.SplitterMoved += new SplitterEventHandler(canvasSplitContainer_SplitterMoved);
             }
         }
         protected override void OnClosed( EventArgs e )
@@ -181,7 +185,7 @@ namespace trees.win_forms
                 var sw = Stopwatch.StartNew();
                 var res = t.figure switch
                 {
-                    SearchByMethodEnum.Rect => _RTree.Search_By_Rect( t.env, topN ),
+                    SearchByMethodEnum.Rect   => _RTree.Search_By_Rect( t.env, topN ),
                     SearchByMethodEnum.Circle => _RTree.Search_By_Circle( t.env.ToCircle_Outscribed(), topN ),
                     _ => throw (new ArgumentException( t.figure.ToString() ))
                 };
@@ -327,10 +331,10 @@ namespace trees.win_forms
         {
             var maxEntries = maxEntriesNUD.ValueAsInt32;
             _Settings.ObjRectCount = objRectCountNUD.ValueAsInt32;
-            _Settings.PADDING_X = paddingX_NUD.ValueAsInt32;
-            _Settings.PADDING_Y = paddingY_NUD.ValueAsInt32;
-            _Settings.MIN_OBJ_WH = minWH_NUD.ValueAsInt32;
-            _Settings.MAX_OBJ_WH = maxWH_NUD.ValueAsInt32;
+            _Settings.PADDING_X    = paddingX_NUD.ValueAsInt32;
+            _Settings.PADDING_Y    = paddingY_NUD.ValueAsInt32;
+            _Settings.MIN_OBJ_WH   = minWH_NUD.ValueAsInt32;
+            _Settings.MAX_OBJ_WH   = maxWH_NUD.ValueAsInt32;
 
             if ( _Settings.MAX_OBJ_WH < _Settings.MIN_OBJ_WH ) { _Settings.MIN_OBJ_WH = _Settings.MAX_OBJ_WH; minWH_NUD.SetValue( _Settings.MIN_OBJ_WH ); }
 
@@ -358,8 +362,9 @@ namespace trees.win_forms
         {
             _Settings.FillNodeList = fillNodeListCheckBox.Checked;
             _Settings.SaveNoThrow();
-
+            
             Refill_rtTreeView( _RTree?.Root );
+            mainSplitContainer_SplitterMoved( sender, /*e*/null );
             Draw2Canvas();
         }
         private void selectColorComboBox_SelectedIndexChanged( object sender, EventArgs e )
@@ -376,5 +381,8 @@ namespace trees.win_forms
         }
 
         private void repeatSearchButton_Click( object sender, EventArgs e ) => Repeat_Search();
+
+        private void mainSplitContainer_SplitterMoved( object sender, SplitterEventArgs e ) => paddingX_NUD.ValueAsInt32 = (mainSplitContainer.Panel1.Width / 2) + 40;
+        private void canvasSplitContainer_SplitterMoved( object sender, SplitterEventArgs e ) => paddingY_NUD.ValueAsInt32 = (canvasSplitContainer.Panel2.Height / 2) + 50;
     }
 }

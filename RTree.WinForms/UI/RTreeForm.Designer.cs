@@ -397,6 +397,7 @@
             mainSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             mainSplitContainer.Location = new System.Drawing.Point( 0, 0 );
             mainSplitContainer.Name = "mainSplitContainer";
+            //---mainSplitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(mainSplitContainer_SplitterMoved);
             // 
             // mainSplitContainer.Panel1
             // 
@@ -416,6 +417,7 @@
             canvasSplitContainer.Location = new System.Drawing.Point( 0, 0 );
             canvasSplitContainer.Name = "canvasSplitContainer";
             canvasSplitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            //---canvasSplitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(canvasSplitContainer_SplitterMoved);
             // 
             // canvasSplitContainer.Panel1
             // 
