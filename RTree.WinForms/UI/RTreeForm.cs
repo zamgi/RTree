@@ -123,9 +123,9 @@ namespace trees.win_forms
                 canvasSplitContainer.SplitterMoved += new SplitterEventHandler(canvasSplitContainer_SplitterMoved);
             }
         }
-        protected override void OnClosed( EventArgs e )
+        protected override void OnFormClosed( FormClosedEventArgs e )
         {
-            base.OnClosed( e );
+            base.OnFormClosed( e );
 
             if ( !base.DesignMode )
             {
@@ -133,11 +133,6 @@ namespace trees.win_forms
                 _Settings.SaveNoThrow();
             }
         }
-        //protected override void OnShown( EventArgs e )
-        //{
-        //    base.OnShown( e );
-        //    ShowTree();
-        //}
 
         protected override void OnKeyDown( KeyEventArgs e )
         {
